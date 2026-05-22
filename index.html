@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Farevefarm - Internal Buying System</title>
+    <!-- Import Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;700&family=Work+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary-blue: #1F3151; /* Estate Blue */
+            --white: #FFFFFF;        /* Elevated White */
+            --dark-text: #11151D;    /* Foggy Day / Deep Dark */
+            --gray-accent: #B4C4D3;  /* Foggy Day Accent */
+            --bg-cream: #EAE7DF;     /* Coarse Wool */
+            --bg-light: #F8F7F4;
+            --success: #2E7D32;
+            --warning: #ED6C02;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Work Sans', 'Anuphan', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--dark-text);
+            line-height: 1.4;
+        }
+
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Tabs Navigation */
+        .tabs {
+            display: flex;
+            background-color: var(--white);
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            border-bottom: 2px solid var(--primary-blue);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: none;
+            border: none;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--primary-blue);
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            font-weight: 700;
+        }
+
+        /* Panel Visibility */
+        .tab-panel {
+            display: none;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* Dashboard Components */
+        .limit-card {
+            background-color: var(--white);
+            border-left: 6px solid var(--primary-blue);
+            padding: 20px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .limit-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .metric-box {
+            background-color: var(--bg-light);
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid var(--gray-accent);
+        }
+
+        .metric-box label {
+            font-size: 13px;
+            color: #666;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .metric-box .value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--primary-blue);
+        }
+
+        /* Forms Styling */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--gray-accent);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            color: var(--dark-text);
+            background-color: var(--white);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 3px rgba(31, 49, 81, 0.1);
+        }
+
+        .btn {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: 'Anuphan', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .btn-warning { background-color: var(--warning); }
+        .btn-success { background-color: var(--success); }
+
+        /* Tables */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 12px;
+            font-weight: 500;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #E0E0E0;
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-light);
+        }
+
+        /* Status Badges */
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        .badge-pending { background-color: #FFE0B2; color: #E65100; }
+        .badge-success { background-color: #C8E6C9; color: #1B5E20; }
+
+        /* Checklist UI Specifics */
+        .section-title {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 10px 15px;
+            margin: 20px 0 10px 0;
+            border-radius: 4px;
+            font-size: 15px;
+        }
+
+        .checklist-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .checklist-grid { grid-template-columns: 1fr; }
+            .tabs { flex-direction: column; }
+        }
+
+        .item-card {
+            border: 1px solid var(--gray-accent);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            background-color: var(--bg-light);
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 5px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .score-display {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary-blue);
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>FAREVEFARM INTERNAL APP</h1>
+        <div id="live-clock" style="font-size: 13px; opacity: 0.8;"></div>
+    </header>
+
+    <div class="container">
+        <!-- Tab Navigation Links -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">หน้าแรก & สรุปตารางนัด</button>
+            <button class="tab-btn" onclick="switchTab('booking')">เพิ่มคิวนัดหมายใหม่</button>
+            <button class="tab-btn" onclick="switchTab('checklist')">หน้าตรวจรับสภาพสินค้า & Checklist</button>
+        </div>
+
+        <!-- TAB 1: DASHBOARD & SUMMARY -->
+        <div id="dashboard" class="tab-panel active">
+            <div class="limit-card">
+                <h2>การควบคุมวงเงินรับซื้อประจำวัน</h2>
+                <div class="limit-grid">
+                    <div class="metric-box">
+                        <label>วงเงินสูงสุดประจำวัน (ปรับแก้ไขได้)</label>
+                        <div id="txt-limit" class="value">2,000,000 บาท</div>
+                        <button class="btn btn-warning" style="margin-top:8px; padding:4px 10px; font-size:12px;" onclick="adjustLimit()">แก้ไขวงเงินฉุกเฉิน</button>
+                    </div>
+                    <div class="metric-box">
+                        <label>ยอดรวมรับซื้อแล้ววันนี้</label>
+                        <div id="txt-today-total" class="value" style="color: var(--success);">0 บาท</div>
+                    </div>
+                    <div class="metric-box">
+                        <label>วงเงินคงเหลือ</label>
+                        <div id="txt-remaining" class="value">2,000,000 บาท</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px;">
+                <h3>ตารางนัดหมายและสถานะรายการ</h3>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label for="filter-date" style="font-size:14px; font-weight:500;">เลือกวันที่ดู:</label>
+                    <input type="date" id="filter-date" class="form-control" style="width:auto; padding:6px;" onchange="loadDailyAppointments()">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID นัดหมาย</th>
+                            <th>เวลานัด</th>
+                            <th>ชื่อลูกค้า</th>
+                            <th>เบอร์โทรศัพท์</th>
+                            <th>จำนวนสินค้า</th>
+                            <th>ยอดรวมโอน (บาท)</th>
+                            <th>การรับสินค้า</th>
+                            <th>การโอนเงิน</th>
+                            <th>จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointment-table-body">
+                        <!-- Data rows injection from Google Sheets -->
+                        <tr>
+                            <td colspan="9" style="text-align:center; color:#888;">กำลังโหลดข้อมูลจากระบบ...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB 2: ADD BOOKING -->
+        <div id="booking" class="tab-panel">
+            <h3 style="margin-bottom:15px; border-bottom: 2px solid var(--primary-blue); padding-bottom:5px;">ลงทะเบียนนัดหมายรับซื้อ</h3>
+            <form id="form-booking" onsubmit="submitBooking(event)">
+                <div class="form-group">
+                    <label>ชื่อ-นามสกุล ลูกค้า</label>
+                    <input type="text" id="cust-name" class="form-control" required placeholder="ตัวอย่าง: คุณสมชาย ใจดี">
+                </div>
+                <div class="form-group">
+                    <label>เบอร์โทรศัพท์ติดต่อ</label>
+                    <input type="tel" id="cust-phone" class="form-control" required placeholder="ตัวอย่าง: 0812345678">
+                </div>
+                <div class="form-group">
+                    <label>วันที่ต้องการนัดหมาย</label>
+                    <input type="date" id="book-date" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label>เวลานัดหมาย (รายชั่วโมง)</label>
+                    <select id="book-time" class="form-control" required>
+                        <option value="09:00">09:00 - 10:00</option>
+                        <option value="10:00">10:00 - 11:00</option>
+                        <option value="11:00">11:00 - 12:00</option>
+                        <option value="12:00">12:00 - 13:00</option>
+                        <option value="13:00">13:00 - 14:00</option>
+                        <option value="14:00">14:00 - 15:00</option>
+                        <option value="15:00">15:00 - 16:00</option>
+                        <option value="16:00">16:00 - 17:00</option>
+                        <option value="17:00">17:00 - 18:00</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn">บันทึกข้อมูลการนัดหมาย</button>
+            </form>
+        </div>
+
+        <!-- TAB 3: CHECKLIST & ASSESSMENT -->
+        <div id="checklist" class="tab-panel">
+            <div style="background-color: var(--bg-light); padding:15px; border-radius:6px; margin-bottom:20px; border:1px solid var(--gray-accent);">
+                <h4>พื้นที่ปฏิบัติงานตรวจสอบสภาพสิ่งของลูกค้า</h4>
+                <p style="font-size:13px; color:#555;" id="active-customer-info">กรุณาเลือกตารางนัดหมายของลูกค้าจาก "หน้าแรก" เพื่อดึงข้อมูลมาทำ Checklist</p>
+            </div>
+
+            <div id="checklist-workspace" style="display:none;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                    <h3>รายการสินค้าของลูกค้าคนนี้</h3>
+                    <button class="btn btn-success" onclick="addNewItemField()">+ เพิ่มสินค้า/แก้ไขจำนวนชิ้นหน้างาน</button>
+                </div>
+
+                <div id="items-container">
+                    <!-- Dynamic product items dynamically generated here -->
+                </div>
+
+                <div style="text-align: right; margin-top:20px;">
+                    <button class="btn" style="padding:12px 30px; font-size:16px;" onclick="saveWholeChecklistData()">บันทึกผลการตรวจสอบสภาพทั้งหมดลงฐานข้อมูล</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Core JavaScript -->
+    <script>
+        // System variables
+        let currentLimit = 2000000;
+        let appointmentDataStore = [];
+        let activeAppointmentID = null;
+
+        // Set Default Date inside inputs
+        document.getElementById('filter-date').valueAsDate = new Date();
+        document.getElementById('book-date').valueAsDate = new Date();
+
+        // Clock display
+        setInterval(() => {
+            const n = new Date();
+            document.getElementById('live-clock').innerText = "เวลาปัจจุบัน: " + n.toLocaleString('th-TH');
+        }, 1000);
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            
+            // Find button linked with the tabId
+            const btnIdx = ['dashboard', 'booking', 'checklist'].indexOf(tabId);
+            document.querySelectorAll('.tab-btn')[btnIdx].classList.add('active');
+        }
+
+        function adjustLimit() {
+            let newLimit = prompt("กรุณากรอกวงเงินรับซื้อสูงสุดประจำวันฉุกเฉิน (บาท):", currentLimit);
+            if (newLimit != null && !isNaN(newLimit) && newLimit > 0) {
+                currentLimit = parseInt(newLimit);
+                document.getElementById('txt-limit').innerText = currentLimit.toLocaleString('th-TH') + " บาท";
+                recalculateMetrics();
+            }
+        }
+
+        function recalculateMetrics() {
+            let todayTotal = 0;
+            // Iterate store data to find total money used today
+            let filterDate = document.getElementById('filter-date').value;
+            appointmentDataStore.forEach(app => {
+                if(app.date === filterDate) {
+                    todayTotal += parseInt(app.totalAmount || 0);
+                }
+            });
+            
+            document.getElementById('txt-today-total').innerText = todayTotal.toLocaleString('th-TH') + " บาท";
+            let rem = currentLimit - todayTotal;
+            document.getElementById('txt-remaining').innerText = rem.toLocaleString('th-TH') + " บาท";
+            if (rem < 0) {
+                document.getElementById('txt-remaining').style.color = "red";
+            } else {
+                document.getElementById('txt-remaining').style.color = "var(--dark-text)";
+            }
+        }
+
+        // Mock Loading or Google Apps Script Interfacing
+        function loadDailyAppointments() {
+            // Under real deployment, call: 
+            // google.script.run.withSuccessHandler(renderData).getAppointments();
+            console.log("Fetching appointments from Google Sheets...");
+            
+            // Temporary Mock Data for standalone view demonstration
+            appointmentDataStore = [
+                {id: "APP-20260522-001", date:"2026-05-22", time:"10:00", name:"คุณสมชาย ใจดี", phone:"0812345678", itemCount:2, totalAmount:125000, statusItem:"รับสินค้าแล้ว", statusPay:"โอนเงินเรียบร้อย"},
+                {id: "APP-20260522-002", date:"2026-05-22", time:"13:00", name:"คุณนภา วงศ์สุวรรณ", phone:"0898765432", itemCount:1, totalAmount:0, statusItem:"รอดำเนินการ", statusPay:"รอดำเนินการ"}
+            ];
+            
+            renderTable();
+        }
+
+        function renderTable() {
+            let filterDate = document.getElementById('filter-date').value;
+            let tbody = document.getElementById('appointment-table-body');
+            tbody.innerHTML = "";
+            
+            let filtered = appointmentDataStore.filter(a => a.date === filterDate);
+            
+            if(filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; color:#999;">ไม่มีนัดหมายรับซื้อในวันที่เลือก</td></tr>`;
+                recalculateMetrics();
+                return;
+            }
+            
+            filtered.forEach(a => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><b>${a.id}</b></td>
+                    <td>${a.time} น.</td>
+                    <td>${a.name}</td>
+                    <td>${a.phone}</td>
+                    <td style="text-align:center;">${a.itemCount}</td>
+                    <td><b>${a.totalAmount.toLocaleString('th-TH')}</b></td>
+                    <td><span class="badge ${a.statusItem==='รับสินค้าแล้ว'?'badge-success':'badge-pending'}">${a.statusItem}</span></td>
+                    <td><span class="badge ${a.statusPay==='โอนเงินเรียบร้อย'?'badge-success':'badge-pending'}">${a.statusPay}</span></td>
+                    <td><button class="btn" style="padding:4px 8px; font-size:11px;" onclick="openChecklistArea('${a.id}', '${a.name}')">ตรวจสภาพ/แก้ไข</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            recalculateMetrics();
+        }
+
+        function submitBooking(e) {
+            e.preventDefault();
+            let name = document.getElementById('cust-name').value;
+            let phone = document.getElementById('cust-phone').value;
+            let date = document.getElementById('book-date').value;
+            let time = document.getElementById('book-time').value;
+            
+            let newId = "APP-" + date.replace(/-/g, "") + "-" + Math.floor(100 + Math.random() * 900);
+            
+            let newApp = {
+                id: newId, date: date, time: time, name: name, phone: phone, itemCount: 0, totalAmount: 0, statusItem: "รอดำเนินการ", statusPay: "รอดำเนินการ"
+            };
+            
+            appointmentDataStore.push(newApp);
+            alert("บันทึกคิวนัดหมายสำเร็จ! ID: " + newId);
+            document.getElementById('form-booking').reset();
+            document.getElementById('filter-date').value = date;
+            switchTab('dashboard');
+            renderTable();
+            
+            // Real deploy integration code:
+            // google.script.run.saveNewBooking(newApp);
+        }
+
+        function openChecklistArea(appId, custName) {
+            activeAppointmentID = appId;
+            document.getElementById('active-customer-info').innerHTML = `<b>ลูกค้า:</b> ${custName} | <b>ID นัดหมาย:</b> ${appId}`;
+            document.getElementById('checklist-workspace').style.display = "block";
+            
+            // Clear and create 1 default template field row item
+            document.getElementById('items-container').innerHTML = "";
+            addNewItemField();
+            switchTab('checklist');
+        }
+
+        let itemCounter = 0;
+        function addNewItemField() {
+            itemCounter++;
+            let div = document.createElement('div');
+            div.className = "item-card";
+            div.id = `item-card-${itemCounter}`;
+            div.innerHTML = `
+                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--gray-accent); padding-bottom:5px; margin-bottom:10px;">
+                    <h4 style="color:var(--primary-blue);">สินค้าชิ้นที่ #${itemCounter}</h4>
+                    <button class="btn btn-warning" style="padding:2px 6px; font-size:11px;" onclick="document.getElementById('item-card-${itemCounter}').remove()">ลบชิ้นนี้</button>
+                </div>
+                <div class="form-group">
+                    <label>หมวดหมู่สินค้าหลัก</label>
+                    <select class="form-control" onchange="toggleCategoryChecklist(${itemCounter}, this.value)" id="cat-${itemCounter}">
+                        <option value="shoes">👟 หมวดรองเท้า (Shoes)</option>
+                        <option value="bag">👜 หมวดกระเป๋า (Bags)</option>
+                        <option value="jewelry">💎 หมวด Fine Jewelry</option>
+                        <option value="acc">⌚ หมวด ACC (อื่นๆ)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>ชื่อรุ่น / รายละเอียดสินค้า</label>
+                    <input type="text" class="form-control" placeholder="ระบุรุ่น ขนาด สี ปี หรือ DC ตัวอย่าง: Loro Piana Summer Charm Walk Size 39.5" id="name-${itemCounter}">
+                </div>
+
+                <!-- DYNAMIC RENDERING FOR SELECTED ITEM CHECKLIST -->
+                <div id="checklist-area-${itemCounter}">
+                    <!-- Default shows shoes layout -->
+                </div>
+            `;
+            document.getElementById('items-container').appendChild(div);
+            toggleCategoryChecklist(itemCounter, 'shoes');
+        }
+
+        function toggleCategoryChecklist(id, category) {
+            let container = document.getElementById(`checklist-area-${id}`);
+            let html = "";
+            
+            if(category === 'shoes') {
+                html = `
+                    <div class="section-title">อุปกรณ์รองเท้า (ระบุ มี/ไม่มี)</div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
+                        <label class="radio-label"><input type="checkbox" checked id="acc1-${id}"> ใบเสร็จ</label>
+                        <label class="radio-label"><input type="checkbox" checked id="acc2-${id}"> ถุงผ้า</label>
+                        <label class="radio-label"><input type="checkbox" checked id="acc3-${id}"> กล่อง</label>
+                        <label class="radio-label"><input type="checkbox" id="acc4-${id}"> การ์ด</label>
+                        <label class="radio-label"><input type="checkbox" id="acc5-${id}"> ถุงกระดาษ</label>
+                    </div>
+                    
+                    <div class="section-title">รายการตรวจสอบสภาพรองเท้า (100 คะแนนเต็ม)</div>
+                    <div class="checklist-grid">
+                        <div>
+                            <label>ทรงรองเท้า</label>
+                            <select class="form-control score-calc-${id}" data-score="20" onchange="calculateItemScore(${id})">
+                                <option value="20">ปกติ (20 คะแนน)</option>
+                                <option value="10">ไม่ปกติ (10 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>อะไหล่ออกซิไดซ์/สนิม</label>
+                            <select class="form-control score-calc-${id}" data-score="20" onchange="calculateItemScore(${id})">
+                                <option value="20">ไม่มี (20 คะแนน)</option>
+                                <option value="10">1-2 จุด (10 คะแนน)</option>
+                                <option value="0">3 จุดขึ้นไป (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>กาวซึม</label>
+                            <select class="form-control score-calc-${id}" data-score="20" onchange="calculateItemScore(${id})">
+                                <option value="20">ไม่มี (20 คะแนน)</option>
+                                <option value="10">1-2 จุด (10 คะแนน)</option>
+                                <option value="0">3 จุดขึ้นไป (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>กลิ่น</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ปกติ (10 คะแนน)</option>
+                                <option value="5">ไม่ปกติ (5 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>เพชรหลุด</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มี (10 คะแนน)</option>
+                                <option value="5">1-2 จุด (5 คะแนน)</option>
+                                <option value="0">3 จุดขึ้นไป (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>ถลอก/เฟด/ขีด</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มีรอย (10 คะแนน)</option>
+                                <option value="5">1-2 จุด (5 คะแนน)</option>
+                                <option value="0">3 จุดขึ้นไป (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>พื้นรองเท้า</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มีรอย (10 คะแนน)</option>
+                                <option value="5">รอยเล็กน้อย (5 คะแนน)</option>
+                                <option value="0">รอยเยอะ (0 คะแนน)</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            } else if(category === 'bag') {
+                html = `
+                    <div class="section-title">อุปกรณ์กระเป๋า</div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
+                        <label class="radio-label"><input type="checkbox" id="acc1-${id}"> ใบเสร็จ Orig.</label>
+                        <label class="radio-label"><input type="checkbox" id="acc2-${id}"> ใบเสร็จ Copy</label>
+                        <label class="radio-label"><input type="checkbox" id="acc3-${id}"> การ์ด</label>
+                        <label class="radio-label"><input type="checkbox" id="acc4-${id}"> ถุงผ้า</label>
+                        <label class="radio-label"><input type="checkbox" id="acc5-${id}"> กล่อง</label>
+                    </div>
+
+                    <div class="section-title">รายการตรวจสอบสภาพกระเป๋า (100 คะแนนเต็ม)</div>
+                    <div class="checklist-grid">
+                        <div>
+                            <label>หนังกระเป๋า</label>
+                            <select class="form-control score-calc-${id}" data-score="15" onchange="calculateItemScore(${id})">
+                                <option value="15">หนังแข็งสวย (15 คะแนน)</option>
+                                <option value="10">หนังนิ่มลง (10 คะแนน)</option>
+                                <option value="5">หนังนิ่มย้วย (5 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>อะไหล่โลหะ</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มีรอย (10 คะแนน)</option>
+                                <option value="5">ขนแมวบางๆ (5 คะแนน)</option>
+                                <option value="0">ขนแมวเยอะ (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>ขอบมุมกระเป๋า</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มีรอย (10 คะแนน)</option>
+                                <option value="5">มีรอยบาง (5 คะแนน)</option>
+                                <option value="0">รอยถลอกลึก (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>รอยปากกา/คราบเครื่องสำอาง</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ไม่มีรอย (10 คะแนน)</option>
+                                <option value="5">เล็กน้อย 1-2 จุด (5 คะแนน)</option>
+                                <option value="0">ใหญ่/3 จุดขึ้นไป (0 คะแนน)</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Default layout container for Fine Jewelry / ACC
+                html = `
+                    <div class="section-title">อุปกรณ์ประเมินเครื่องประดับ/ACC</div>
+                    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap:10px;">
+                        <label class="radio-label"><input type="checkbox" id="acc1-${id}"> ใบรับประกัน/Cert.</label>
+                        <label class="radio-label"><input type="checkbox" id="acc2-${id}"> กล่องใน/กล่องนอก</label>
+                        <label class="radio-label"><input type="checkbox" id="acc3-${id}"> ถุงผ้า</label>
+                    </div>
+
+                    <div class="section-title">รายการประเมินเครื่องประดับ ACC (100 คะแนนเต็ม)</div>
+                    <div class="checklist-grid">
+                        <div>
+                            <label>รูปทรงโดยรวม</label>
+                            <select class="form-control score-calc-${id}" data-score="10" onchange="calculateItemScore(${id})">
+                                <option value="10">ปกติ (10 คะแนน)</option>
+                                <option value="0">ไม่ปกติ (0 คะแนน)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label>อะไหล่และริ้วรอย</label>
+                            <select class="form-control score-calc-${id}" data-score="20" onchange="calculateItemScore(${id})">
+                                <option value="20">ไม่มีรอย (20 คะแนน)</option>
+                                <option value="10">ขนแมวบางๆ (10 คะแนน)</option>
+                                <option value="5">ขนแมวเยอะ (5 คะแนน)</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Append bottom universal attributes
+            html += `
+                <div style="margin-top:15px; background: #FFF; padding:10px; border-radius:6px; border:1px solid #DDD;">
+                    <div class="form-group">
+                        <label>ข้อมูลจากลูกค้า</label>
+                        <div class="radio-group">
+                            <label class="radio-label"><input type="radio" name="cust-info-${id}" value="ไม่เคยใช้งาน" checked> ไม่เคยใช้งาน</label>
+                            <label class="radio-label"><input type="radio" name="cust-info-${id}" value="ผ่านการใช้งาน"> ผ่านการใช้งาน</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>ระบุราคาประเมินรับซื้อชิ้นนี้ (บาท)</label>
+                        <input type="number" class="form-control item-price-input" placeholder="จำนวนเงินโอน" id="price-${id}" value="0">
+                    </div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <div class="score-display">คะแนนดิบประเมิน: <span id="score-val-${id}">100</span>/100</div>
+                        <div>
+                            <label style="font-weight:bold;">สรุป Condition (ปรับแก้ตามความเหมาะสมได้):</label>
+                            <select class="form-control" id="cond-${id}" style="width:180px; font-weight:bold; color:var(--primary-blue);">
+                                <option value="NEW">NEW (95-100)</option>
+                                <option value="KEPT UNUSED">KEPT UNUSED (85-95)</option>
+                                <option value="LIKE NEW">LIKE NEW (75-85)</option>
+                                <option value="USED">USED (<75)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            container.innerHTML = html;
+            calculateItemScore(id);
+        }
+
+        function calculateItemScore(id) {
+            let selects = document.querySelectorAll(`.score-calc-${id}`);
+            let score = 0;
+            selects.forEach(sel => {
+                score += parseInt(sel.value || 0);
+            });
+            
+            // For custom lists where default sum might not reach 100, normalize or set default
+            if(selects.length === 0) score = 100;
+
+            document.getElementById(`score-val-${id}`).innerText = score;
+            
+            // Auto Condition adjustment selector binding
+            let condSel = document.getElementById(`cond-${id}`);
+            if (score >= 95) condSel.value = "NEW";
+            else if (score >= 85) condSel.value = "KEPT UNUSED";
+            else if (score >= 75) condSel.value = "LIKE NEW";
+            else condSel.value = "USED";
+        }
+
+        function saveWholeChecklistData() {
+            let cards = document.querySelectorAll('.item-card');
+            if(cards.length === 0) {
+                alert("เกิดข้อผิดพลาด: ไม่พบรายการสินค้าสำหรับตรวจรับสภาพ");
+                return;
+            }
+
+            let totalBuyingPrice = 0;
+            let itemDetailsLog = [];
+
+            cards.forEach(card => {
+                let idNum = card.id.replace('item-card-', '');
+                let cat = document.getElementById(`cat-${idNum}`).value;
+                let title = document.getElementById(`name-${idNum}`).value || "สินค้าทั่วไป";
+                let score = document.getElementById(`score-val-${idNum}`).innerText;
+                let cond = document.getElementById(`cond-${idNum}`).value;
+                let price = parseInt(document.getElementById(`price-${idNum}`).value || 0);
+                
+                totalBuyingPrice += price;
+                itemDetailsLog.push({ cat, title, score, cond, price });
+            });
+
+            // Update state in our database dictionary store
+            let targetApp = appointmentDataStore.find(a => a.id === activeAppointmentID);
+            if(targetApp) {
+                targetApp.itemCount = cards.length;
+                targetApp.totalAmount = totalBuyingPrice;
+                targetApp.statusItem = "รับสินค้าแล้ว";
+                targetApp.statusPay = "โอนเงินเรียบร้อย";
+            }
+
+            alert(`ทำการประเมินและบันทึกข้อมูลเรียบร้อย!
+จำนวนสินค้าทั้งสิ้น: ${cards.length} ชิ้น
+ยอดเงินรวมทั้งสิ้น: ${totalBuyingPrice.toLocaleString('th-TH')} บาท`);
+            switchTab('dashboard');
+            renderTable();
+
+            // Interlocking interface architecture for script:
+            // google.script.run.uploadChecklistToSheets(activeAppointmentID, itemDetailsLog, totalBuyingPrice);
+        }
+
+        // Run on first init load
+        loadDailyAppointments();
+    </script>
+</body>
+</html>
